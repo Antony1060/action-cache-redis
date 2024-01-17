@@ -45942,7 +45942,7 @@ try {
             process.exit(0);
         }
         await (0,promises_namespaceObject.writeFile)(tarFilePath, tarContent);
-        await exec.exec("tar", ["-xzf", tarFilePath, "-C", "/"]);
+        await exec.exec("tar", ["-I", "pigz", "-xf", tarFilePath, "-C", "/"]);
         core.info("Cache hit and restored");
         core.setOutput("cache-hit", true);
         process.exit(0);
