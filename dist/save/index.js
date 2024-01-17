@@ -48377,7 +48377,6 @@ try {
         await exec.exec("tar", ["-czvf", tarFilePath, ...files]);
         const tarContent = await (0,promises_namespaceObject.readFile)(tarFilePath);
         await redisClient.set(cacheKey, tarContent);
-        core.info("doing save");
         process.exit(0);
     })();
 }

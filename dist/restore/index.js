@@ -45937,16 +45937,15 @@ try {
         const tarFilePath = `/tmp/${cacheKey}.tar.gz`;
         const tarContent = await redisClient.get((0,dist.commandOptions)({ returnBuffers: true }), cacheKey);
         if (!tarContent) {
-            core.info("cache miss");
+            core.info("Cache miss");
             core.setOutput("cache-hit", false);
             process.exit(0);
-            return;
         }
         await (0,promises_namespaceObject.writeFile)(tarFilePath, tarContent);
         await exec.exec("tar", ["-xzvf", tarFilePath, "-C", "/"]);
-        core.info("cache hit and restored");
+        await exec.exec("ls", ["-lh", tarFilePath]);
+        core.info("Cache hit and restored");
         core.setOutput("cache-hit", true);
-        core.info("doing restore");
         process.exit(0);
     })();
 }
