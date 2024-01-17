@@ -30,6 +30,7 @@ try {
         const tarFilePath = `/tmp/${cacheKey}.tar.gz`
 
         await exec.exec("tar", ["-czvf", tarFilePath, ...files]);
+        await exec.exec("ls", ["-lh", tarFilePath]);
 
         const tarContent = await readFile(tarFilePath);
 
