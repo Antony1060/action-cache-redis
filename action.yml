@@ -7,7 +7,7 @@ inputs:
     key:
         description: Cache key
         required: true
-    redis_url:
+    redis-url:
         description: Redis connection url
         required: true
         default: redis://127.0.0.1:6379
@@ -17,5 +17,5 @@ outputs:
 
 runs:
     using: "node20"
-    main: "dist/restore.js"
-    post: "dist/save.js"
+    main: "dist/restore/index.js"
+    post: "dist/save/index.js"

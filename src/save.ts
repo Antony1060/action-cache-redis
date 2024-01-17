@@ -1,21 +1,40 @@
 import * as core from "@actions/core"
 import * as glob from "@actions/glob"
+import * as exec from "@actions/exec"
+import {createHash} from "node:crypto"
+import {readFile} from "node:fs/promises"
+import { createClient} from "redis";
+
+const hashSha256 = (input: Buffer): Buffer => {
+    return createHash("sha256").update(input).digest();
+}
 
 try {
     (async () => {
         const paths = core.getInput("paths");
+        const key = core.getInput("key");
+        const redisUrl = core.getInput("redis-url");
+
+        const redisClient = await createClient({ url: redisUrl }).connect();
 
         const globber = await glob.create(paths);
         const files = await globber.glob();
 
-        core.startGroup("files");
+        const repoName = process.env.GITHUB_REPOSITORY ?? "";
+        core.info(`Running on ${repoName}`);
+        const repoHashed = hashSha256(Buffer.from(repoName, "utf8"));
 
-        for (const file of files)
-            core.info(file);
+        const cacheKey = `${repoHashed.toString("hex")}-${key}`
+        core.info(cacheKey);
 
-        core.endGroup();
+        const tarFilePath = `/tmp/${cacheKey}.tar.gz`
 
-        core.info("doing save");
+        await exec.exec("tar", ["-czvf", tarFilePath, ...files]);
+
+        const tarContent = await readFile(tarFilePath);
+
+        await redisClient.set(cacheKey, tarContent);
+        process.exit(0);
     })()
 } catch (error) {
     if (typeof error === "object" && error !== null && "message" in error && typeof error.message === "string")
