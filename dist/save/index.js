@@ -48374,7 +48374,8 @@ try {
         const cacheKey = `${repoHashed.toString("hex")}-${key}`;
         core.info(cacheKey);
         const tarFilePath = `/tmp/${cacheKey}.tar.gz`;
-        await exec.exec("tar", ["-czvf", tarFilePath, ...files]);
+        await exec.exec("tar", ["-czf", tarFilePath, ...files]);
+        await exec.exec("ls", ["-lh", tarFilePath]);
         const tarContent = await (0,promises_namespaceObject.readFile)(tarFilePath);
         await redisClient.set(cacheKey, tarContent);
         process.exit(0);
